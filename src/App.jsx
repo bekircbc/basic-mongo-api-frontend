@@ -1,45 +1,87 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import './App.scss';
+import axios from 'axios';
+
+const url = 'http://localhost:3459';
 
 function App() {
-  const [count, setCount] = useState(0)
+	const [books, setBooks] = useState([]);
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.jsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  )
+	useEffect(() => {
+		(async () => {
+			const _books = (await axios.get(`${url}/book`)).data.books;
+			_books.forEach((book) => {
+				book.editPanelShowing = false;
+			});
+			setBooks(_books);
+		})();
+	}, []);
+
+	const handleButtonDelete = async (e, book) => {
+		const deleteUrl = `${url}/book/${book._id}`;
+		await axios.delete(deleteUrl);
+		const _books = books.filter((m) => m._id !== book._id);
+		setBooks(_books);
+	};
+
+	const handleButtonEdit = async (e, book) => {
+		book.editPanelShowing = true;
+		setBooks([...books]);
+	};
+
+	return (
+		<div className="App">
+			<h1>Book Site</h1>
+
+			<p>There are {books.length} books.</p>
+
+			<div className="books">
+				{books.map((book, i) => {
+					return (
+						<div key={i} className="book">
+							<img src={book.imageUrl} />
+							<div className="info">
+								<div className="title">{book.title}</div>
+								<div className="description">
+									{book.description}
+								</div>
+								<div className="buttons">
+									<button
+										onClick={(e) =>
+											handleButtonDelete(e, book)
+										}
+									>
+										Delete
+									</button>
+									<button
+										onClick={(e) =>
+											handleButtonEdit(e, book)
+										}
+									>
+										Edit
+									</button>
+								</div>
+								{book.editPanelShowing && (
+									<>
+										<div className="editPanel">
+											edit panel
+											<button
+												onClick={(e) =>
+													handleButtonClear(e, book)
+												}
+											>
+												Clear
+											</button>
+										</div>
+									</>
+								)}
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
 }
 
-export default App
+export default App;
