@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
 import './App.scss';
 import axios from 'axios';
+import { EditBookForm } from './components/EditBookForm';
 
 const url = 'http://localhost:3459';
 
 function App() {
 	const [books, setBooks] = useState([]);
+	const [fieldTitle, setFieldTitle] = useState('');
+	const [fieldDescription, setFieldDescription] = useState('');
+	const [fieldNumberOfPages, setFieldNumberOfPages] = useState('');
+	const [fieldLanguage, setFieldLanguage] = useState('');
+	const [fieldImageUrl, setFieldImageUrl] = useState('');
+	const [fieldBuyUrl, setFieldBuyUrl] = useState('');
+	const [addPanelShowing, setAddPanelShowing] = useState(false);
+	const [addBook, setAddBook] = useState({});
 
 	useEffect(() => {
 		(async () => {
@@ -26,7 +35,53 @@ function App() {
 
 	const handleButtonEdit = async (e, book) => {
 		book.editPanelShowing = true;
+		setFieldTitle(book.title);
+		setFieldDescription(book.description);
+		setFieldNumberOfPages(book.numberOfPages);
+		setFieldLanguage(book.language);
+		setFieldImageUrl(book.imageUrl);
+		setFieldBuyUrl(book.buyUrl);
 		setBooks([...books]);
+	};
+
+	const handleButtonClear = async (e, book) => {
+		e.preventDefault();
+		book.editPanelShowing = false;
+		setFieldTitle('');
+		setFieldDescription('');
+		setFieldNumberOfPages('');
+		setFieldLanguage('');
+		setFieldImageUrl('');
+		setFieldBuyUrl('');
+		setBooks([...books]);
+	};
+
+	const handleButtonSave = async (e, book) => {
+		e.preventDefault();
+		book.editPanelShowing = false;
+
+		book.title = fieldTitle;
+		book.description = fieldDescription;
+		book.numberOfPages = fieldNumberOfPages;
+		book.language = fieldLanguage;
+		book.imageUrl = fieldImageUrl;
+		book.buyUrl = fieldBuyUrl;
+
+		const putUrl = `${url}/book/${book._id}`;
+		await axios.put(putUrl, {
+			title: book.title,
+			description: book.description,
+			numberOfPages: book.numberOfPages,
+			language: book.language,
+			imageUrl: book.imageUrl,
+			buyUrl: book.buyUrl,
+		});
+
+		setBooks([...books]);
+	};
+
+	const handleAddBook = async (e, book) => {
+		setAddPanelShowing(!addPanelShowing);
 	};
 
 	return (
@@ -34,6 +89,30 @@ function App() {
 			<h1>Book Site</h1>
 
 			<p>There are {books.length} books.</p>
+
+			<div className="addArea">
+				<button className="addBook" onClick={(e) => handleAddBook(e)}>
+					Add Book
+				</button>
+				<EditBookForm
+					formIsShowing={addPanelShowing}
+					fieldTitle={fieldTitle}
+					setFieldTitle={setFieldTitle}
+					fieldDescription={fieldDescription}
+					setFieldDescription={setFieldDescription}
+					fieldNumberOfPages={fieldNumberOfPages}
+					setFieldNumberOfPages={setFieldNumberOfPages}
+					fieldLanguage={fieldLanguage}
+					setFieldLanguage={setFieldLanguage}
+					fieldImageUrl={fieldImageUrl}
+					setFieldImageUrl={setFieldImageUrl}
+					fieldBuyUrl={fieldBuyUrl}
+					setFieldBuyUrl={setFieldBuyUrl}
+					handleButtonClear={handleButtonClear}
+					handleButtonSave={handleButtonSave}
+					addBook={addBook}
+				/>
+			</div>
 
 			<div className="books">
 				{books.map((book, i) => {
@@ -54,6 +133,7 @@ function App() {
 										Delete
 									</button>
 									<button
+										disabled={book.editPanelShowing}
 										onClick={(e) =>
 											handleButtonEdit(e, book)
 										}
@@ -61,20 +141,26 @@ function App() {
 										Edit
 									</button>
 								</div>
-								{book.editPanelShowing && (
-									<>
-										<div className="editPanel">
-											edit panel
-											<button
-												onClick={(e) =>
-													handleButtonClear(e, book)
-												}
-											>
-												Clear
-											</button>
-										</div>
-									</>
-								)}
+								<EditBookForm
+									formIsShowing={book.editPanelShowing}
+									fieldTitle={fieldTitle}
+									setFieldTitle={setFieldTitle}
+									fieldDescription={fieldDescription}
+									setFieldDescription={setFieldDescription}
+									fieldNumberOfPages={fieldNumberOfPages}
+									setFieldNumberOfPages={
+										setFieldNumberOfPages
+									}
+									fieldLanguage={fieldLanguage}
+									setFieldLanguage={setFieldLanguage}
+									fieldImageUrl={fieldImageUrl}
+									setFieldImageUrl={setFieldImageUrl}
+									fieldBuyUrl={fieldBuyUrl}
+									setFieldBuyUrl={setFieldBuyUrl}
+									handleButtonClear={handleButtonClear}
+									handleButtonSave={handleButtonSave}
+									book={book}
+								/>
 							</div>
 						</div>
 					);
@@ -83,5 +169,3 @@ function App() {
 		</div>
 	);
 }
-
-export default App;
