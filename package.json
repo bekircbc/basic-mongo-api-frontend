@@ -1,7 +1,9 @@
 {
   "name": "basic-mongo-api-frontend",
-  "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "start": "run-p backend frontend",
     "backend": "nodemon backend/server.js",
@@ -10,6 +12,9 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
     "cors": "^2.8.5",
