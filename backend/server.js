@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import { Book } from './models/Book.js';
+import cors from 'cors';
 
 const app = express();
 const port = 3459;
@@ -34,13 +35,13 @@ app.get('/', (req, res) => {
 app.post('/book', async (req, res) => {
 	const book = new Book(req.body);
 	await book.save();
-	res.status(200).json({ message: 'added book', book });
+	res.status(200).json({ message: 'book created', book });
 });
 
 //getting books data
 
 app.get('/book', async (req, res) => {
-	const books = await Book.find();
+	const books = await Book.find().sort({ title: 1 });
 	res.status(200).json({ message: 'fetched all books', books });
 });
 
