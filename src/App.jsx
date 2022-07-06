@@ -44,6 +44,43 @@ function App() {
 		setBooks([...books]);
 	};
 
+	const handleAddButtonClear = async (e, book) => {
+		e.preventDefault();
+		setAddPanelShowing(false);
+		setFieldTitle('');
+		setFieldDescription('');
+		setFieldNumberOfPages('');
+		setFieldLanguage('');
+		setFieldImageUrl('');
+		setFieldBuyUrl('');
+	};
+
+	const handleAddButtonSave = async (e, _book) => {
+		e.preventDefault();
+		setAddPanelShowing(false);
+
+		addBook.title = fieldTitle;
+		addBook.description = fieldDescription;
+		addBook.numberOfPages = fieldNumberOfPages;
+		addBook.language = fieldLanguage;
+		addBook.imageUrl = fieldImageUrl;
+		addBook.buyUrl = fieldBuyUrl;
+
+		const addUrl = `${url}/book`;
+		const ret = await axios.post(addUrl, {
+			title: addBook.title,
+			description: addBook.description,
+			numberOfPages: addBook.numberOfPages,
+			language: addBook.language,
+			imageUrl: addBook.imageUrl,
+			buyUrl: addBook.buyUrl,
+		});
+
+		const _books = [...books];
+		_books.push(ret.data.book);
+
+		setBooks(_books);
+	};
 	const handleButtonClear = async (e, book) => {
 		e.preventDefault();
 		book.editPanelShowing = false;
@@ -57,6 +94,7 @@ function App() {
 	};
 
 	const handleButtonSave = async (e, book) => {
+		console.log(book);
 		e.preventDefault();
 		book.editPanelShowing = false;
 
@@ -81,6 +119,9 @@ function App() {
 	};
 
 	const handleAddBook = async (e, book) => {
+		setAddBook({
+			title: 'default value',
+		});
 		setAddPanelShowing(!addPanelShowing);
 	};
 
@@ -108,8 +149,8 @@ function App() {
 					setFieldImageUrl={setFieldImageUrl}
 					fieldBuyUrl={fieldBuyUrl}
 					setFieldBuyUrl={setFieldBuyUrl}
-					handleButtonClear={handleButtonClear}
-					handleButtonSave={handleButtonSave}
+					handleButtonClear={handleAddButtonClear}
+					handleButtonSave={handleAddButtonSave}
 					addBook={addBook}
 				/>
 			</div>
@@ -169,3 +210,5 @@ function App() {
 		</div>
 	);
 }
+
+export default App;
