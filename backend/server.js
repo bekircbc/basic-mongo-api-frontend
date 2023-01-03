@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const MONGODB_CONNECTION =
-	process.env.MONGODB_CONNECTION || 'mongodb://localhost/bookapi';
+	process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017/bookapi';
 
 const app = express();
 app.use(cors());
